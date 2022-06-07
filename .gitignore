@@ -1,0 +1,15 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/termisskey
+termisskey.so
+termisskey.dylib
+termisskey.dll
+termisskey.a
+termisskey.lib
+termisskey-test-*
+*.exe
+*.o
+*.obj
+*.lst
