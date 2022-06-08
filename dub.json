@@ -3,5 +3,8 @@
   "description": "A TUI client of Misskey",
   "copyright": "Copyright © 2022, YamaD",
   "authors": ["YamaD"],
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "ncurses": "~>0.0.149"
+  }
 }
