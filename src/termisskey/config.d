@@ -4,17 +4,13 @@ import termisskey.log;
 
 struct Config {
   string token;
+  // フィールド以外置きたくない
 }
 
 bool has(Config self, string name) {
-  foreach (s; [__traits(allMembers, typeof(self))]) switch (s) {
-  case "has":
-  case "setStr":
-    continue;
-  default:
+  foreach (s; [__traits(allMembers, typeof(self))])
     if (s == name)
       return true;
-  }
   return false;
 }
 
