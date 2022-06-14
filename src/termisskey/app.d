@@ -8,11 +8,11 @@ void main(string[] args) {
   auto logger = new Logger;
   with (logger) {
     auto config = mergeConfig(
-        loadConfig(*logger),
+        loadConfig(logger),
         args.parse);
     logDbg("config generated");
     // print config
-    screen(config, *logger);
+    screen(config, logger);
     logDbg("bye");
   }
 }

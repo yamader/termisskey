@@ -2,30 +2,42 @@ module termisskey.log;
 
 enum LogLevel {
   Error,
-  Warn,
   Info,
   Debug,
 }
 
-struct Logger {
-  import std.stdio: File, stdout, stderr;
+class Logger {
+  import std.stdio: File;
 
   private:
     LogLevel level;
+    File fout, ferr;
 
   public:
-    void log(string msg, LogLevel level = LogLevel.Info, File f = stdout) {
-      auto txt = msg;
-      if (level <= this.level) {
-        f.writeln(txt);
-      }
+    this() {
+      import std.stdio: stdout, stderr;
+
+      this.level = LogLevel.Info;
+      this.fout = stdout;
+      this.ferr = stderr;
+    }
+
+    void log(string msg) {
+      _log(msg, LogLevel.Info, fout);
     }
 
     void logErr(string msg) {
-      log(msg, LogLevel.Error, stderr);
+      _log(msg, LogLevel.Error, ferr);
     }
 
     void logDbg(string msg) {
-      log(msg, LogLevel.Debug);
+      _log(msg, LogLevel.Debug, fout);
+    }
+
+  private:
+    void _log(string msg, LogLevel level, File f) {
+      auto txt = msg;
+      if (level <= this.level)
+        f.writeln(txt);
     }
 }
