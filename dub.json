@@ -5,6 +5,7 @@
   "authors": ["YamaD"],
   "license": "MIT",
   "dependencies": {
-    "ncurses": "~>0.0.149"
+    "ncurses": "~>0.0.149",
+    "yamad": "~>1.0"
   }
 }

@@ -1,27 +1,12 @@
 module termisskey.config;
 
 import termisskey.log;
+import yama.d: has, set;
 
 struct Config {
+  string host;
   string token;
   // フィールド以外置きたくない
-}
-
-bool has(Config self, string name) {
-  foreach (s; [__traits(allMembers, typeof(self))])
-    if (s == name)
-      return true;
-  return false;
-}
-
-void setStr(Config self, string name, string val) {
-  switch (name) {
-  case "token":
-    self.token = val;
-    break;
-  default:
-    throw new Exception("AAGGHHHHHH");
-  }
 }
 
 Config loadConfig(Logger logger) {
@@ -65,10 +50,10 @@ Config loadConfig(Logger logger) {
       }
       try {
         if (!line.val.length) {
-          conf.setStr(line.key, "true");
+          conf.set(line.key, "true");
           logDbg(`load config "%s": flag = "true"`.format(line.key));
         } else {
-          conf.setStr(line.key, line.val);
+          conf.set(line.key, line.val);
           logDbg(`load config "%s" = "%s"`.format(line.key, line.val));
         }
       } catch (Exception) {
