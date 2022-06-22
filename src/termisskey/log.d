@@ -1,5 +1,10 @@
 module termisskey.log;
 
+static Logger logger;
+static this() {
+  logger = new Logger(LogLevel.Info);
+}
+
 enum LogLevel {
   Error,
   Info,
@@ -14,12 +19,16 @@ class Logger {
     File fout, ferr;
 
   public:
-    this() {
+    this(LogLevel level) {
       import std.stdio: stdout, stderr;
 
-      this.level = LogLevel.Info;
-      this.fout = stdout;
-      this.ferr = stderr;
+      this(level, stderr, stdout);
+    }
+
+    this(LogLevel level, File fout, File ferr) {
+      this.level = level;
+      this.fout = fout;
+      this.ferr = ferr;
     }
 
     void log(string msg) {
