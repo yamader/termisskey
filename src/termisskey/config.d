@@ -9,24 +9,9 @@ struct AppConfig {
   // フィールド以外置きたくない
 }
 
-AppConfig loadAppConfig(string path) {
-  import std.stdio: File;
-  import std.file: FileException;
-
-  File f;
-  scope (exit)
-    f.close;
-  try {
-    f = File(path, "r");
-  } catch (Exception) {
-    logger.logDbg("config file not found");
-    return AppConfig();
-  }
-
-  import std.string: chomp;
-  import std.array: join;
-  import std.format: format;
+AppConfig parseConfig(string raw) {
   import std.typecons: tuple;
+  import std.array: split;
 
   auto ref KV(T)(T haystack, T needle) {
     auto strip(C)(C[] a) {
@@ -48,27 +33,26 @@ AppConfig loadAppConfig(string path) {
   }
 
   AppConfig conf;
-
-  char[] buf;
-  while (f.readln(buf)) {
-    auto line = KV(buf.chomp.idup, "=");
-    if (!conf.has(line.key)) {
-      logger.logErr(`invalid config: field "` ~ line.key ~ `" unknown`);
+  foreach (line; raw.split("\n")) {
+    auto kv = KV(line, "=");
+    if (kv.key == "")
+      continue;
+    if (!conf.has(kv.key)) {
+      logger.logErr(`invalid config: field "` ~ kv.key ~ `" unknown`);
       continue;
     }
     try {
-      if (!line.val.length) {
-        conf.set(line.key, "true");
-        logger.logDbg(`load config "` ~ line.key ~ `": flag = "true"`);
+      if (!kv.val.length) {
+        conf.set(kv.key, "true");
+        logger.logDbg(`load config "` ~ kv.key ~ `": flag = "true"`);
       } else {
-        conf.set(line.key, line.val);
-        logger.logDbg(`load config "` ~ line.key ~ `" = "` ~ line.val ~ `"`);
+        conf.set(kv.key, kv.val);
+        logger.logDbg(`load config "` ~ kv.key ~ `" = "` ~ kv.val ~ `"`);
       }
     } catch (Exception) {
-      logger.logErr(`invalid config: "` ~ line.key ~ `" = "` ~ line.val ~ `"`);
+      logger.logErr(`invalid config: "` ~ kv.key ~ `" = "` ~ kv.val ~ `"`);
     }
   }
-
   return conf;
 }
 

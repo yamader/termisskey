@@ -12,6 +12,7 @@ enum LogLevel {
 }
 
 class Logger {
+  import std.conv: to;
   import std.stdio: File;
 
   private:
@@ -31,21 +32,32 @@ class Logger {
       this.ferr = ferr;
     }
 
-    void log(string msg) {
-      _log(msg, LogLevel.Info, fout);
+    void log(string msg, size_t line = __LINE__, string mod = __MODULE__, string func = __FUNCTION__) {
+      logFmt(msg, LogLevel.Info, fout, ctxFmt(line, mod, func));
     }
 
-    void logErr(string msg) {
-      _log(msg, LogLevel.Error, ferr);
+    void logErr(string msg, size_t line = __LINE__, string mod = __MODULE__, string func = __FUNCTION__) {
+      logFmt(msg, LogLevel.Error, ferr, ctxFmt(line, mod, func));
     }
 
-    void logDbg(string msg) {
-      _log(msg, LogLevel.Debug, fout);
+    void logDbg(string msg, size_t line = __LINE__, string mod = __MODULE__, string func = __FUNCTION__) {
+      logFmt(msg, LogLevel.Debug, fout, ctxFmt(line, mod, func));
     }
 
   private:
-    void _log(string msg, LogLevel level, File f) {
-      auto txt = msg;
+    static string ctxFmt(size_t line, string mod, string func) {
+      return mod ~ ":" ~ line.to!string ~ " " ~ func;
+    }
+
+    void logFmt(string msg, LogLevel level, File f, string ctx) {
+      import std.datetime.systime: Clock;
+
+      auto ts = Clock.currTime.to!string;
+      auto txt = "[" ~ ts ~ "]\t" ~ level.to!string ~ "\t(" ~ ctx ~ ")\t" ~ msg;
+      logRaw(txt, level, f);
+    }
+
+    void logRaw(string txt, LogLevel level, File f) {
       if (level <= this.level)
         f.writeln(txt);
     }
