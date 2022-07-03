@@ -16,31 +16,31 @@ struct Args {
 }
 
 void main(string[] argv) {
-  import std.conv: to;
-  import std.file: exists, mkdir, readText, FileException;
-  import std.path: dirName;
   import std.process: environment;
-  import std.stdio: File;
 
   enum appDir = "/termisskey";
+  auto home = environment.get("HOME", ".");
+  auto conf = environment.get("XDG_CONFIG_HOME", home ~ "/.config") ~ appDir;
+  auto data = environment.get("XDG_DATA_HOME", home ~ "/.local/share") ~ appDir;
+  Args init = {
+    config: conf ~ "/config",
+    log: data ~ "/log",
+    loglevel: LogLevel.Info,
+  };
+  CLI!Args.parseArgs!app(argv[1 .. $], init);
+}
 
-  // args
-  Args args;
-  {
-    auto home = environment.get("HOME", ".");
-    Args defaultArgs = {
-      config: environment.get("XDG_CONFIG_HOME", home ~ "/.config") ~ appDir ~ "/config",
-      log: environment.get("XDG_DATA_HOME", home ~ "/.local/share") ~ appDir ~ "/log",
-      loglevel: LogLevel.Info,
-    };
-    CLI!Args.parseArgs(args = defaultArgs, argv[1 .. $]);
-  }
+void app(Args args) {
+  import std.conv: to;
+  import std.file: exists, mkdirRecurse, readText, FileException;
+  import std.path: dirName;
+  import std.stdio: File;
 
   // logger
   {
     try {
       if (!args.log.dirName.exists)
-        args.log.dirName.mkdir;
+        args.log.dirName.mkdirRecurse;
       auto flog = File(args.log, "a");
       logger = new Logger(args.loglevel, flog, flog);
     } catch (FileException) {
@@ -57,7 +57,7 @@ void main(string[] argv) {
       token = args.config_token;
     }
     if (!args.config.dirName.exists)
-      args.config.dirName.mkdir;
+      args.config.dirName.mkdirRecurse;
     else if (args.config.exists)
       try {
         config = mergeConfig(args.config.readText.parseConfig, config);
