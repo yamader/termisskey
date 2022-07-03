@@ -1,0 +1,16 @@
+name "termisskey"
+description "A TUI client of Misskey"
+authors "YamaD"
+copyright "Copyright © 2022, YamaD"
+license "MIT"
+dependency "argparse" version="~>1.0.0"
+dependency "ncurses" version="~>0.0.149"
+dependency "yamad" version="~>1"
+targetPath "build"
+configuration "executable" {
+	targetType "executable"
+}
+configuration "static" {
+	targetType "executable"
+	dflags "-static" platform="posix"
+}
